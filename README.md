@@ -44,7 +44,7 @@ class AccountPage
 
   sfdc_picklist(:type, sfdc_field_name: 'Type')
   sfdc_lookup(:parent_account, sfdc_field_name: 'Parent_Account')
- sfdc_checkbox(:approved?, sfdc_field_name: 'Approved')
+  sfdc_checkbox(:approved?, sfdc_field_name: 'Approved')
   button(:edit, sfdc_field_name: 'edit')
 
 end
