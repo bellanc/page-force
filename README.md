@@ -51,34 +51,33 @@ end
 
 ## Supported Salesforce Fields
 
-Type
-Auto Number
-Checkbox
-Currency
-Date
-Date/Time
-Email
-External Lookup Relationship
-Geolocation
-Hierarchical Relationship
-Indirect Lookup Relationship
-Lookup Relationship
-Master-Detail Relationship
-Number
-Note
-Percent
-Phone
-Picklist
-Picklist (Multi-select)
-Roll-Up Summary
-Text
-Text (Encrypted)
-Text Area
-Text Area (Long)
-Note
-Text Area (Rich)
-URL
-Note
+- Type
+- Auto Number
+- Checkbox
+- Currency
+- Date
+- Date/Time
+- Email
+- External Lookup Relationship
+- Geolocation
+- Hierarchical Relationship
+- Indirect Lookup Relationship
+- Lookup Relationship
+- Master-Detail Relationship
+- Number
+- Note
+- Percent
+- Phone
+- Picklist
+- Picklist (Multi-select)
+- Roll-Up Summary
+- Text
+- Text (Encrypted)
+- Text Area
+- Text Area (Long)
+- Text Area (Rich)
+- URL
+
 
 ## Contributing
 
