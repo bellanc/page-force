@@ -215,11 +215,10 @@ module PageObject
     end
 
     def sfdc_related_list(name, section_class, identifier)
-      label_text = identifier.fetch(:sflabel) { raise InvalidIdentifierExecption, "#{identifier.keys.first} is not a valid identifier for this element type." }
-
+      sfdc_object_name = identifier.fetch(:sfdc_object_name) { raise InvalidIdentifierExecption, "#{identifier.keys.first} is not a valid identifier for this element type." }
+      meta_data = sfdc_object_metadata(sfdc_object_name)
+      page_sections()
       define_method(name) do
-        xpath_exact_label_match = "//h3[text() ='#{label_text}']"
-        xpath_fuzzy_match = "//h3[contains(.,'#{label_text}')]"
         xpath_expression = element_exists_for_identifier?(xpath: xpath_exact_label_match) ? xpath_exact_label_match : xpath_fuzzy_match
         table_rows_xpath = "#{xpath_expression}//following::tbody[1]/tr[position()>1]"
         platform.pages_for({xpath: table_rows_xpath}, section_class)

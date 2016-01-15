@@ -8,18 +8,19 @@ require 'page-force/accessors'
 
 module PageForce
   SFDCObjectField = Struct.new(:field_name, :id)
+
   def self.included(base)
     base.include PageObject
 
     base.class_eval do
-      @standard_fields = [SFDCObjectField.new(field_name:'CreatedBy', id: 'CreatedBy'),
-                          SFDCObjectField.new(field_name:'CreatedDate', id: 'CreatedDate'),
-                          SFDCObjectField.new(field_name:'LastModifiedBy', id: 'LastModifiedBy'),
-                          SFDCObjectField.new(field_name:'LastModifiedDate', id: 'LastModifiedDate'),
-                          SFDCObjectField.new(field_name:'Owner', id: 'Owner'),
-                          SFDCObjectField.new(field_name:'Name', id: 'Name'),
-                          SFDCObjectField.new(field_name:'Currency', id: 'Currency'),
-                          SFDCObjectField.new(field_name:'Division', id: 'Division')]
+      @standard_fields = [SFDCObjectField.new(field_name: 'CreatedBy', id: 'CreatedBy'),
+                          SFDCObjectField.new(field_name: 'CreatedDate', id: 'CreatedDate'),
+                          SFDCObjectField.new(field_name: 'LastModifiedBy', id: 'LastModifiedBy'),
+                          SFDCObjectField.new(field_name: 'LastModifiedDate', id: 'LastModifiedDate'),
+                          SFDCObjectField.new(field_name: 'Owner', id: 'Owner'),
+                          SFDCObjectField.new(field_name: 'Name', id: 'Name'),
+                          SFDCObjectField.new(field_name: 'Currency', id: 'Currency'),
+                          SFDCObjectField.new(field_name: 'Division', id: 'Division')]
 
 
       def self.custom_fields
@@ -32,17 +33,27 @@ module PageForce
 
       def self.object_label=(sfdc_object_name)
         object_developer_name = sfdc_object_name.strip.gsub(' ', '_')
-        sfdc_object_data = Config.sfdc_tooling_client.query("Select Id, DeveloperName, NamespacePrefix
-                                                         From CustomObject where DeveloperName = '#{object_developer_name}'").first
-        raise "Salesforce Object with Label Name #{sfdc_object_name} does not exist!" if sfdc_object_data.nil?
-        meta_data = Config.sfdc_tooling_client.query("Select Id, DeveloperName
-                                        From CustomField Where TableEnumOrId = '#{sfdc_object_data.Id}'")
-
+        meta_data = custom_field_metadata_for_sfdc_object(object_developer_name)
         self.custom_fields = meta_data.map do |field|
           SFDCObjectField.new(field.DeveloperName, field.Id[0..14])
         end.concat(@standard_fields)
-
       end
     end
+
   end
+
+  def sfdc_object_metadata(object_developer_name)
+    Config.sfdc_tooling_client.query("Select Id, DeveloperName, NamespacePrefix
+                                      From CustomObject where DeveloperName = '#{object_developer_name}'").first
+  end
+
+  def custom_field_metadata_for_sfdc_object(object_developer_name)
+    sfdc_object_data = sfdc_object_metadata(object_developer_name)
+    raise "Salesforce Object with Label Name #{sfdc_object_name} does not exist!" if sfdc_object_data.nil?
+    Config.sfdc_tooling_client.query("Select Id, DeveloperName
+                                      From CustomField Where TableEnumOrId = '#{sfdc_object_data.Id}'")
+  end
+
 end
+
+
