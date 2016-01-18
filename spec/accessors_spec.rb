@@ -1,20 +1,26 @@
 require 'spec_helper'
 
-class WatirAccessorsTestPageObject
-  include PageObject
-
-  sf_field(:record_id, :sflabel => 'Record Id')
-  sf_text_field(:social_security_number, :sflabel => 'SSN')
-  sf_button(:generate, :sflabel => 'Generate Lead')
-  sf_select_list(:state, :sflabel => 'State')
-  sf_link(:account, :sflabel => 'Account')
-  # sf_related_list(:click_me, :sflabel => 'button_submit')
-  # visualforce_page(:active, :id => 'is_active_id')
-
-end
-
-
 describe PageObject::Accessors do
+  allow(PageForce).to receive(:included).with(WatirAccessorsTestPageObject).and_return true
+
+  class WatirAccessorsTestPageObject
+    include PageForce
+
+    class AgreementsList
+      include PageObject
+    end
+
+    sfdc_cell(:record_id, :sfdc_field_name => 'Record_Id')
+    sfdc_text_field(:social_security_number, :sfdc_field_name => 'SSN')
+    sfdc_button(:generate, :sfdc_field_name => 'Generate_Lead')
+    sfdc_select_list(:state, :sfdc_field_name => 'State')
+    sfdc_link(:account, :sfdc_field_name => 'Account')
+    sfdc_related_list(:agreements, AgreementsList, sfdc_object_name: 'APTS_Agreement')
+    visualforce_page(visualforce_name: 'CS_ProposalRecordType') do |vf_page|
+      button(:change_to_proposal, value: 'Change to Proposal', frame: vf_page)
+    end
+
+  end
 
   context "when using Watir" do
     let(:watir_browser) { mock_watir_browser }

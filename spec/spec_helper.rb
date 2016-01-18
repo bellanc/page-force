@@ -11,7 +11,7 @@ require 'watir-webdriver'
 require 'selenium-webdriver'
 
 require 'page-object'
-require 'page-object-salesforce'
+require 'page-force'
 
 def mock_watir_browser
   watir_browser = double('watir')
