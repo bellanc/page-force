@@ -207,11 +207,9 @@ module PageObject
     alias_method :sfdc_lookup_field, :sfdc_lookup
     alias_method :sfdc_masterdetail, :sfdc_lookup
 
-    def visualforce_page(name, section_class, visualforce_page_name)
-      identifier = {title: visualforce_page_name}
-      define_method(name) do
-        platform.visualforce_page_for(identifier, section_class)
-      end
+    def visualforce_page(identifier, embedded_visualforce_page=nil, &block)
+      visualforce_page_name = identifier.fetch(:visualforce_name) { raise InvalidIdentifierExecption, "#{identifier.keys.first} is not a valid identifier for this element type." }
+      in_iframe({title: visualforce_page_name}, embedded_visualforce_page, &block)
     end
 
     def sfdc_related_list(name, related_list_class, identifier)
@@ -222,9 +220,7 @@ module PageObject
       define_method(name) do
         send("#{name}_section")
       end
-
     end
-
 
     def find_sfdc_field_metadata(identifier)
       sfdc_field_name = identifier.fetch(:sfdc_field_name) { raise InvalidIdentifierExecption, "#{identifier.keys.first} is not a valid identifier for this element type." }

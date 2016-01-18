@@ -50,7 +50,6 @@ module PageForce
           SFDCObjectField.new(field.DeveloperName, field.Id[0..14])
         end.concat(@standard_fields)
       end
-
     end
   end
 end
