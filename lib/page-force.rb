@@ -33,7 +33,7 @@ module PageForce
 
       def self.sfdc_object_id_for_developer_name(object_developer_name)
         sfdc_object_meta_data = Config.sfdc_tooling_client.query("Select Id From CustomObject where DeveloperName = '#{object_developer_name}'").first
-        raise "Salesforce Object with Label Name #{sfdc_object_name} does not exist!" if sfdc_object_meta_data.nil?
+        raise "Salesforce Object with Label Name \"#{object_developer_name}\" does not exist!" if sfdc_object_meta_data.nil?
         @sfdc_object_id = sfdc_object_meta_data.Id
       end
 
