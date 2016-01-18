@@ -214,10 +214,11 @@ module PageObject
       end
     end
 
-    def sfdc_related_list(name, section_class, identifier)
+    def sfdc_related_list(name, related_list_class, identifier)
       sfdc_object_name = identifier.fetch(:sfdc_object_name) { raise InvalidIdentifierExecption, "#{identifier.keys.first} is not a valid identifier for this element type." }
-      meta_data = sfdc_object_metadata(sfdc_object_name)
-      page_sections()
+      meta_data = sfdc_object_id_for_developer_name(sfdc_object_name)
+      related_list_id = "#{self.sfdc_object_id}_#{meta_data.id}"
+      page_sections("#{name}_section", related_list_class, related_list_id)
       define_method(name) do
         xpath_expression = element_exists_for_identifier?(xpath: xpath_exact_label_match) ? xpath_exact_label_match : xpath_fuzzy_match
         table_rows_xpath = "#{xpath_expression}//following::tbody[1]/tr[position()>1]"
