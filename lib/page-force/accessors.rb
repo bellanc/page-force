@@ -6,7 +6,7 @@ module PageObject
   module Accessors
     def sfdc_cell(name, identifier, &block)
       sfdc_element = find_sfdc_field_metadata(identifier)
-      cell(name, id: "#{sfdc_element.id}_ilecell", &block)
+      cell(name, id: /#{sfdc_element.id}/, &block)
     end
 
     alias_method :sfdc_summary, :sfdc_cell
@@ -14,7 +14,7 @@ module PageObject
     def sfdc_text_field(name, identifier, &block)
       sfdc_element = find_sfdc_field_metadata(identifier)
 
-      cell "#{name}_cell", id: "#{sfdc_element.id}_ilecell", &block
+      cell "#{name}_cell", id: /#{sfdc_element.id}/, &block
       text_field "#{name}_text_field", id: sfdc_element.id, &block
 
 
@@ -41,7 +41,7 @@ module PageObject
     def sfdc_text_area(name, identifier, &block)
       sfdc_element = find_sfdc_field_metadata(identifier)
 
-      cell "#{name}_cell", id: "#{sfdc_element.id}_ilecell", &block
+      cell "#{name}_cell", id:  /#{sfdc_element.id}/, &block
       text_area "#{name}_text_area", id: sfdc_element.id, &block
 
 
@@ -101,7 +101,7 @@ module PageObject
     def sfdc_select_list(name, identifier, &block)
       sfdc_element = find_sfdc_field_metadata(identifier)
 
-      cell("#{name}_cell", id: "#{sfdc_element.id}_ilecell", &block)
+      cell("#{name}_cell", id: /#{sfdc_element.id}/, &block)
       select_list("#{name}_select_list", id: sfdc_element.id, &block)
 
       define_method("#{name}_element") do
@@ -133,7 +133,7 @@ module PageObject
       sfdc_element = find_sfdc_field_metadata(identifier)
 
       link("#{name}_link", id: /lookup(.*)#{sfdc_element.id}/, &block)
-      cell("#{name}_cell", id: "#{sfdc_element.id}_ilecell", &block)
+      cell("#{name}_cell", id: /#{sfdc_element.id}/, &block)
       text_field("#{name}_text_field", id: sfdc_element.id, &block)
 
       define_method("#{name}_element") do
@@ -172,7 +172,7 @@ module PageObject
 
 
       link("#{name}_link", id: /lookup(.*)#{sfdc_element.id}/, &block)
-      cell("#{name}_cell", id: "#{sfdc_element.id}_ilecell", &block)
+      cell("#{name}_cell", id:  /#{sfdc_element.id}/, &block)
       text_field("#{name}_text_field", id: "CF#{sfdc_element.id}", &block)
 
       define_method("#{name}_element") do
@@ -223,8 +223,11 @@ module PageObject
     end
 
     def find_sfdc_field_metadata(identifier)
+      raise "sfdc_object_name not set for page class" unless @sfdc_object_name
       sfdc_field_name = identifier.fetch(:sfdc_field_name) { raise InvalidIdentifierExecption, "#{identifier.keys.first} is not a valid identifier for this element type." }
-      self.custom_fields.find(-> { raise InvalidIdentifierExecption, "sfdc_field_name \"#{sfdc_field_name}\" not found." }) { |field| field.field_name == sfdc_field_name }
+
+      standard_fields = PageForce::StandardObject.const_get(@sfdc_object_name)::STANDARD_FIELDS if PageForce::StandardObject.const_defined?(@sfdc_object_name)
+      self.custom_fields.clone.concat(standard_fields).find(-> { raise InvalidIdentifierExecption, "sfdc_field_name \"#{sfdc_field_name}\" not found." }) { |field| field.field_name == sfdc_field_name }
     end
 
     def sfdc_field_xpath_for(label)

@@ -5,6 +5,7 @@ require 'active_support'
 require 'active_support/inflector'
 require 'page-force/config'
 require 'page-force/accessors'
+require 'page-force/standard_object'
 
 module PageForce
   attr_accessor :custom_fields
@@ -17,14 +18,14 @@ module PageForce
     base.include PageObject
 
     base.class_eval do
-      @standard_fields = [SFDCObjectField.new('CreatedBy', 'CreatedBy'),
-                          SFDCObjectField.new('CreatedDate', 'CreatedDate'),
-                          SFDCObjectField.new('LastModifiedBy', 'LastModifiedBy'),
-                          SFDCObjectField.new('LastModifiedDate', 'LastModifiedDate'),
-                          SFDCObjectField.new('Owner', 'Owner'),
-                          SFDCObjectField.new('Name', 'Name'),
-                          SFDCObjectField.new('Currency', 'Currency'),
-                          SFDCObjectField.new('Division', 'Division')]
+      @system_fields = [SFDCObjectField.new('CreatedBy', 'CreatedBy'),
+                        SFDCObjectField.new('CreatedDate', 'CreatedDate'),
+                        SFDCObjectField.new('LastModifiedBy', 'LastModifiedBy'),
+                        SFDCObjectField.new('LastModifiedDate', 'LastModifiedDate'),
+                        SFDCObjectField.new('Owner', 'Owner'),
+                        SFDCObjectField.new('Name', 'Name'),
+                        SFDCObjectField.new('Currency', 'Currency'),
+                        SFDCObjectField.new('Division', 'Division')]
 
 
       def self.custom_fields
@@ -33,13 +34,15 @@ module PageForce
 
       def self.sfdc_object_id_for_developer_name(object_developer_name)
         sfdc_object_meta_data = Config.sfdc_tooling_client.query("Select Id From CustomObject where DeveloperName = '#{object_developer_name}'").first
-        raise "Salesforce Object with Label Name \"#{object_developer_name}\" does not exist!" if sfdc_object_meta_data.nil?
-        @sfdc_object_id = sfdc_object_meta_data.Id
+        @sfdc_object_name = object_developer_name
+        @sfdc_object_id = sfdc_object_meta_data ? sfdc_object_meta_data.Id : object_developer_name
       end
 
       def self.custom_field_metadata_for_sfdc_object(object_developer_name)
         sfdc_object_id = self.sfdc_object_id_for_developer_name(object_developer_name)
-        Config.sfdc_tooling_client.query("Select Id, DeveloperName From CustomField Where TableEnumOrId = '#{sfdc_object_id}'")
+        sfdc_field_meta_data = Config.sfdc_tooling_client.query("Select Id, DeveloperName From CustomField Where TableEnumOrId = '#{sfdc_object_id}'")
+        raise "Salesforce Object with Label Name \"#{object_developer_name}\" does not exist!" if sfdc_field_meta_data.nil?
+        sfdc_field_meta_data
       end
 
 
@@ -48,7 +51,8 @@ module PageForce
         meta_data = self.custom_field_metadata_for_sfdc_object(object_developer_name)
         @custom_fields = meta_data.map do |field|
           SFDCObjectField.new(field.DeveloperName, field.Id[0..14])
-        end.concat(@standard_fields)
+        end.concat(@system_fields)
+        sfdc_object_name
       end
     end
   end
