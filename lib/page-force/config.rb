@@ -20,7 +20,7 @@ module PageForce
         if sfdc_api_client.instance_of?(Restforce::Data::Client)
           @sfdc_api_client = sfdc_api_client
         else
-          raise InvalidToolingClientException
+          raise InvalidAPIClientException
         end
       end
     end
@@ -31,6 +31,14 @@ class InvalidToolingClientException
 
   def message
     "sfdc_tooling_client must be set to an instance of ActiveForce::Tooling::Client"
+  end
+
+end
+
+class InvalidAPIClientException
+
+  def message
+    "sfdc_tooling_client must be set to an instance of ActiveForce::Data::Client"
   end
 
 end

@@ -235,6 +235,7 @@ module PageObject
       end
     end
 
+    private
     def find_sfdc_field_id(identifier)
       raise "sfdc_object_name not set for page class" unless @sfdc_object_name
 
@@ -248,10 +249,6 @@ module PageObject
         raise InvalidIdentifierExecption, "#{identifier.keys.first} is not a valid identifier for this element type."
       end
       sfdc_field_id
-    end
-
-    def sfdc_field_xpath_for(label)
-      "//*[contains(.,'#{label}') and @class='labelCol']//following-sibling::*[contains(@class ,'dataCol') or contains(@class ,'data2Col')]"
     end
   end
 end
