@@ -22,9 +22,9 @@ Restforce.configure do |config|
   config.client_secret = CONNECTED_APP_DATA[:app][:client_secret]
 end
 
-TOOLING_API = Restforce.tooling username: CONNECTED_APP_DATA[:app][:username],
-                                password: CONNECTED_APP_DATA[:app][:password],
-                                security_token: CONNECTED_APP_DATA[:app][:security_token],
+TOOLING_API = Restforce.tooling username: CONNECTED_APP_DATA[:credentials][:admin][:username],
+                                password: CONNECTED_APP_DATA[:credentials][:admin][:password],
+                                security_token: CONNECTED_APP_DATA[:credentials][:admin][:security_token],
                                 host: 'test.salesforce.com'
 
 

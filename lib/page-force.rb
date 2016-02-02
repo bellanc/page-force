@@ -18,15 +18,6 @@ module PageForce
     base.include PageObject
 
     base.class_eval do
-      @system_fields = [SFDCObjectField.new('CreatedBy', 'CreatedBy'),
-                        SFDCObjectField.new('CreatedDate', 'CreatedDate'),
-                        SFDCObjectField.new('LastModifiedBy', 'LastModifiedBy'),
-                        SFDCObjectField.new('LastModifiedDate', 'LastModifiedDate'),
-                        SFDCObjectField.new('Owner', 'Owner'),
-                        SFDCObjectField.new('Name', 'Name'),
-                        SFDCObjectField.new('Currency', 'Currency'),
-                        SFDCObjectField.new('Division', 'Division')]
-
 
       def self.custom_fields
         @custom_fields ||= []
@@ -51,7 +42,7 @@ module PageForce
         meta_data = self.custom_field_metadata_for_sfdc_object(object_developer_name)
         @custom_fields = meta_data.map do |field|
           SFDCObjectField.new(field.DeveloperName, field.Id[0..14])
-        end.concat(@system_fields)
+        end
         sfdc_object_name
       end
     end

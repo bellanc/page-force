@@ -46,18 +46,16 @@ describe 'PageForce::Accessors' do
       self.sfdc_object_name = 'Account'
 
       sfdc_text_field(:phone, sfdc_field_name: 'Phone')
-      sfdc_cell(:account_owner, sfdc_field_name: 'Owner')
-      sfdc_select_list(:ownership, sfdc_field_name: 'Ownership')
+      sfdc_lookup(:account_owner, sfdc_field_name: 'Owner')
       sfdc_link(:website, sfdc_field_name: 'Website')
       sfdc_lookup(:parent_account, sfdc_field_name: 'Parent')
-
-      sfdc_text_area(:billing_street, sfdc_field_name: 'BillingStreet')
+      sfdc_text_area(:mail_street, sfdc_field_name: 'MailingStreet')
     end
 
     context 'View' do
       context '.sfdc_text_field' do
 
-        subject { on(AccountPage) }
+        subject { on(AccountPage).phone }
 
         it { is_expected.to_not be_nil }
 
@@ -65,31 +63,7 @@ describe 'PageForce::Accessors' do
 
       context '.sfdc_cell' do
 
-        subject { on(AccountPage) }
-
-        it { is_expected.to_not be_nil }
-
-      end
-
-      context '.sfdc_text_area' do
-
-        subject { on(AccountPage) }
-
-        it { is_expected.to_not be_nil }
-
-      end
-
-      context '.sfdc_checkbox' do
-
-        subject { on(AccountPage) }
-
-        it { is_expected.to_not be_nil }
-
-      end
-
-      context '.sfdc_select_list' do
-
-        subject { on(AccountPage) }
+        subject { on(AccountPage).account_owner_element.text }
 
         it { is_expected.to_not be_nil }
 
@@ -97,7 +71,7 @@ describe 'PageForce::Accessors' do
 
       context '.sfdc_link' do
 
-        subject { on(AccountPage) }
+        subject { on(AccountPage).website_element.text }
 
         it { is_expected.to_not be_nil }
 
@@ -105,7 +79,7 @@ describe 'PageForce::Accessors' do
 
       context '.sfdc_lookup' do
 
-        subject { on(AccountPage) }
+        subject { on(AccountPage).parent_account }
 
         it { is_expected.to_not be_nil }
 

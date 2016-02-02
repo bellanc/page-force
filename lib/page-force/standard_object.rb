@@ -3,7 +3,8 @@ module PageForce
     SFDCObjectField = Struct.new(:field_name, :id)
 
     class Account
-      STANDARD_FIELDS = [SFDCObjectField.new('AccountName', 'acc2'),
+      STANDARD_FIELDS = [SFDCObjectField.new('Owner', 'acc1'),
+                         SFDCObjectField.new('AccountName', 'acc2'),
                          SFDCObjectField.new('Parent', 'acc3'),
                          SFDCObjectField.new('AccountSite', 'acc23'),
                          SFDCObjectField.new('AccountNumber', 'acc5'),
@@ -26,10 +27,16 @@ module PageForce
                          SFDCObjectField.new('ShippingStreet', 'acc18street'),
                          SFDCObjectField.new('ShippingCity', 'acc18city'),
                          SFDCObjectField.new('ShippingStateProvince', 'acc18state'),
-                         SFDCObjectField.new('ShippingZipCode', 'acc18zip'),
-                         SFDCObjectField.new('ShippingCountry', 'acc18country'),
+                         SFDCObjectField.new('MailingZipCode', 'acc18zip'),
+                         SFDCObjectField.new('MailingCountry', 'acc18country'),
+                         SFDCObjectField.new('MailingStreet', 'acc19street'),
+                         SFDCObjectField.new('MailingCity', 'acc19city'),
+                         SFDCObjectField.new('MailingStateProvince', 'acc19state'),
+                         SFDCObjectField.new('MailingZipCode', 'acc19zip'),
+                         SFDCObjectField.new('MailingCountry', 'acc19country'),
                          SFDCObjectField.new('BillingAddress', 'acc17'),
                          SFDCObjectField.new('ShippingAddress', 'acc18'),
+                         SFDCObjectField.new('MailingAddress', 'acc19'),
                          SFDCObjectField.new('Street', 'acc18street'),
                          SFDCObjectField.new('City', 'acc18city'),
                          SFDCObjectField.new('State/Province', 'acc18state'),
@@ -40,7 +47,8 @@ module PageForce
     end
 
     class Contact
-      STANDARD_FIELDS =[SFDCObjectField.new('First Name', 'name_firstcon2'),
+      STANDARD_FIELDS =[SFDCObjectField.new('Owner', 'con1'),
+                        SFDCObjectField.new('First Name', 'name_firstcon2'),
                         SFDCObjectField.new('Last Name', 'name_lastcon2'),
                         SFDCObjectField.new('Account', 'con4'),
                         SFDCObjectField.new('Title', 'con5'),
@@ -69,7 +77,8 @@ module PageForce
     end
 
     class Opportunity
-      STANDARD_FIELDS = [SFDCObjectField.new('Name', 'opp3'),
+      STANDARD_FIELDS = [SFDCObjectField.new('Owner', 'opp1'),
+                         SFDCObjectField.new('Name', 'opp3'),
                          SFDCObjectField.new('Account', 'opp4'),
                          SFDCObjectField.new('Type', 'opp5'),
                          SFDCObjectField.new('LeadSource', 'opp6'),
@@ -84,7 +93,8 @@ module PageForce
     end
 
     class Case
-      STANDARD_FIELDS = [SFDCObjectField.new('ContactID', 'cas3'),
+      STANDARD_FIELDS = [SFDCObjectField.new('Owner', 'cas1'),
+                         SFDCObjectField.new('ContactID', 'cas3'),
                          SFDCObjectField.new('Contact', 'cas3'),
                          SFDCObjectField.new('Type', 'cas5'),
                          SFDCObjectField.new('CaseReason', 'cas6'),
@@ -107,7 +117,8 @@ module PageForce
     end
 
     class Lead
-      STANDARD_FIELDS = [SFDCObjectField.new('FirstName', 'name_firstlea2'),
+      STANDARD_FIELDS = [SFDCObjectField.new('Owner', 'lea1'),
+                         SFDCObjectField.new('FirstName', 'name_firstlea2'),
                          SFDCObjectField.new('LastName', 'name_lastlea2'),
                          SFDCObjectField.new('Company', 'lea3'),
                          SFDCObjectField.new('Title', 'lea4'),
