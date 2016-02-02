@@ -42,14 +42,15 @@ describe 'PageForce::Accessors' do
 
     class AccountPage
       include PageForce
-
       self.sfdc_object_name = 'Account'
 
-      sfdc_text_field(:phone, sfdc_field_name: 'Phone')
-      sfdc_lookup(:account_owner, sfdc_field_name: 'Owner')
-      sfdc_link(:website, sfdc_field_name: 'Website')
-      sfdc_lookup(:parent_account, sfdc_field_name: 'Parent')
-      sfdc_text_area(:mail_street, sfdc_field_name: 'MailingStreet')
+      self.materialize_fields = true
+
+      # sfdc_text_field(:phone, sfdc_field_name: 'Phone')
+      # sfdc_lookup(:account_owner, sfdc_field_name: 'Owner')
+      # sfdc_link(:website, sfdc_field_name: 'Website')
+      # sfdc_lookup(:parent_account, sfdc_field_name: 'Parent')
+      # sfdc_text_area(:mail_street, sfdc_field_name: 'MailingStreet')
     end
 
     context 'View' do

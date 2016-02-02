@@ -34,3 +34,4 @@ RESTFORCE_API = Restforce.new username: CONNECTED_APP_DATA[:credentials][:admin]
                               host: 'test.salesforce.com'
 
 PageForce::Config.sfdc_tooling_client = TOOLING_API
+PageForce::Config.sfdc_api_client = RESTFORCE_API

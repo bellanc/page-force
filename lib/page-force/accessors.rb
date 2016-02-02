@@ -226,8 +226,7 @@ module PageObject
       raise "sfdc_object_name not set for page class" unless @sfdc_object_name
       sfdc_field_name = identifier.fetch(:sfdc_field_name) { raise InvalidIdentifierExecption, "#{identifier.keys.first} is not a valid identifier for this element type." }
 
-      standard_fields = PageForce::StandardObject.const_get(@sfdc_object_name)::STANDARD_FIELDS if PageForce::StandardObject.const_defined?(@sfdc_object_name)
-      self.custom_fields.clone.concat(standard_fields).find(-> { raise InvalidIdentifierExecption, "sfdc_field_name \"#{sfdc_field_name}\" not found." }) { |field| field.field_name == sfdc_field_name }
+      self.object_fields..find(-> { raise InvalidIdentifierExecption, "sfdc_field_name \"#{sfdc_field_name}\" not found." }) { |field| field.field_name == sfdc_field_name }
     end
 
     def sfdc_field_xpath_for(label)
