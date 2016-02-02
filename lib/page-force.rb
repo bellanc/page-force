@@ -5,44 +5,65 @@ require 'active_support'
 require 'active_support/inflector'
 require 'page-force/config'
 require 'page-force/accessors'
+require 'page-force/standard_object'
 
 module PageForce
+  attr_accessor :custom_fields
+  attr_reader :sfdc_object_id, :sfdc_object_name, :object_description
+
   SFDCObjectField = Struct.new(:field_name, :id)
+
+
   def self.included(base)
     base.include PageObject
 
     base.class_eval do
-      @standard_fields = [SFDCObjectField.new(field_name:'CreatedBy', id: 'CreatedBy'),
-                          SFDCObjectField.new(field_name:'CreatedDate', id: 'CreatedDate'),
-                          SFDCObjectField.new(field_name:'LastModifiedBy', id: 'LastModifiedBy'),
-                          SFDCObjectField.new(field_name:'LastModifiedDate', id: 'LastModifiedDate'),
-                          SFDCObjectField.new(field_name:'Owner', id: 'Owner'),
-                          SFDCObjectField.new(field_name:'Name', id: 'Name'),
-                          SFDCObjectField.new(field_name:'Currency', id: 'Currency'),
-                          SFDCObjectField.new(field_name:'Division', id: 'Division')]
-
 
       def self.custom_fields
-        @custom_fields ||= []
+        @object_fields ||= []
       end
 
-      def self.custom_fields=(value)
-        @custom_fields = value
+      def self.sfdc_object_id_for_developer_name(object_developer_name)
+        sfdc_object_meta_data = Config.sfdc_tooling_client.query("Select Id From CustomObject where DeveloperName = '#{object_developer_name}'").first
+        @sfdc_object_name = object_developer_name
+        @sfdc_object_id = sfdc_object_meta_data ? sfdc_object_meta_data.Id : object_developer_name
       end
 
-      def self.object_label=(sfdc_object_name)
+      def self.custom_field_metadata_for_sfdc_object(object_developer_name)
+        sfdc_object_id = self.sfdc_object_id_for_developer_name(object_developer_name)
+        sfdc_field_meta_data = Config.sfdc_tooling_client.query("Select Id, DeveloperName From CustomField Where TableEnumOrId = '#{sfdc_object_id}'")
+        raise "Salesforce Object with Label Name \"#{object_developer_name}\" does not exist!" if sfdc_field_meta_data.nil?
+        sfdc_field_meta_data
+      end
+
+
+      def self.sfdc_object_name=(sfdc_object_name)
         object_developer_name = sfdc_object_name.strip.gsub(' ', '_')
-        sfdc_object_data = Config.sfdc_tooling_client.query("Select Id, DeveloperName, NamespacePrefix
-                                                         From CustomObject where DeveloperName = '#{object_developer_name}'").first
-        raise "Salesforce Object with Label Name #{sfdc_object_name} does not exist!" if sfdc_object_data.nil?
-        meta_data = Config.sfdc_tooling_client.query("Select Id, DeveloperName
-                                        From CustomField Where TableEnumOrId = '#{sfdc_object_data.Id}'")
-
-        self.custom_fields = meta_data.map do |field|
+        meta_data = self.custom_field_metadata_for_sfdc_object(object_developer_name)
+        @object_fields = meta_data.map do |field|
           SFDCObjectField.new(field.DeveloperName, field.Id[0..14])
-        end.concat(@standard_fields)
+        end
 
+        @object_fields.concat(StandardObject.const_get(sfdc_object_name)::STANDARD_FIELDS) if StandardObject.const_defined? sfdc_object_name
+
+        @object_description = Config.sfdc_api_client.describe(sfdc_object_name)
+        sfdc_object_name
       end
+
+      def self.materialize_fields=(boolean_value)
+        return generate_page_objects_for_sfdc_object if boolean_value
+      end
+
+      private
+      def self.generate_page_objects_for_sfdc_object
+        @object_fields.each do |field|
+          field_desc = @object_description.fields.find {|field_desc| field_desc.name.match /#{field.field_name}/}
+          send("sfdc_#{field_desc.type}", field.field_name.underscore, sfdc_field_id: field.id) if field_desc && field_desc.type != 'multipicklist'
+        end
+      end
+
     end
   end
 end
+
+

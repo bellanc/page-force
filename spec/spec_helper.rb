@@ -11,34 +11,27 @@ require 'watir-webdriver'
 require 'selenium-webdriver'
 
 require 'page-object'
-require 'page-object-salesforce'
+require 'page-force'
+include PageObject::PageFactory
 
-def mock_watir_browser
-  watir_browser = double('watir')
-  allow(watir_browser).to receive(:is_a?).with(anything()).and_return(false)
-  allow(watir_browser).to receive(:is_a?).with(Watir::Browser).and_return(true)
-  watir_browser
+
+CONNECTED_APP_DATA = YAML.load_file("#{Dir.home}/connected_app.yml")
+Restforce.configure do |config|
+  config.api_version =  "34.0"
+  config.client_id = CONNECTED_APP_DATA[:app][:client_id]
+  config.client_secret = CONNECTED_APP_DATA[:app][:client_secret]
 end
 
-
-def mock_selenium_browser
-  selenium_browser = double('selenium')
-  allow(selenium_browser).to receive(:is_a?).with(anything).and_return(false)
-  allow(selenium_browser).to receive(:is_a?).with(Selenium::WebDriver::Driver).and_return(true)
-  selenium_browser
-end
+TOOLING_API = Restforce.tooling username: CONNECTED_APP_DATA[:credentials][:admin][:username],
+                                password: CONNECTED_APP_DATA[:credentials][:admin][:password],
+                                security_token: CONNECTED_APP_DATA[:credentials][:admin][:security_token],
+                                host: 'test.salesforce.com'
 
 
-def mock_adapter(browser, page_object)
-  adapter = double('adapter')
-  allow(adapter).to receive(:is_for?).with(anything()).and_return false
-  allow(adapter).to receive(:is_for?).with(browser).and_return true
-  allow(adapter).to receive(:create_page_object).and_return page_object
-  allow(adapter).to receive(:root_element_for).and_return browser
-  allow(adapter).to receive(:browser_for).and_return browser
-  adapter
-end
+RESTFORCE_API = Restforce.new username: CONNECTED_APP_DATA[:credentials][:admin][:username],
+                              password: CONNECTED_APP_DATA[:credentials][:admin][:password],
+                              security_token: CONNECTED_APP_DATA[:credentials][:admin][:security_token],
+                              host: 'test.salesforce.com'
 
-def mock_adapters(adapters)
-  allow(PageObject::Platforms).to receive(:get).and_return adapters
-end
+PageForce::Config.sfdc_tooling_client = TOOLING_API
+PageForce::Config.sfdc_api_client = RESTFORCE_API
