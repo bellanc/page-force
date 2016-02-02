@@ -57,8 +57,8 @@ module PageForce
       private
       def self.generate_page_objects_for_sfdc_object
         @object_fields.each do |field|
-          x = @object_description.fields.find {|field_desc| field_desc.name.match /#{field.field_name}/}
-          puts x
+          field_desc = @object_description.fields.find {|field_desc| field_desc.name.match /#{field.field_name}/}
+          send("sfdc_#{field_desc.type}", field.field_name.underscore, sfdc_field_id: field.id) if field_desc && field_desc.type != 'multipicklist'
         end
       end
 
