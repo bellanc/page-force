@@ -1,11 +1,12 @@
 module PageForce
   class Config
     class << self
-      attr_reader :sfdc_tooling_client, :sfdc_api_client
+      attr_reader :sfdc_tooling_client, :sfdc_api_client, :sobject_descriptions
 
       def establish_connection(connection_args)
         @sfdc_api_client ||= Restforce.new connection_args
         @sfdc_tooling_client ||= Restforce.tooling connection_args
+        @sobject_descriptions = @sfdc_api_client.describe
       end
 
       def sfdc_tooling_client=(sfdc_tooling_client)

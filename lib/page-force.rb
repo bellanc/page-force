@@ -46,7 +46,7 @@ module PageForce
 
         @object_fields.concat(StandardObject.const_get(sfdc_object_name)::STANDARD_FIELDS) if StandardObject.const_defined? sfdc_object_name
 
-        @object_description = Config.sfdc_api_client.describe(sfdc_object_name)
+        @object_description = Config.sobject_descriptions.find {|sobject| sobject.name.include? object_developer_name}
         sfdc_object_name
       end
 
