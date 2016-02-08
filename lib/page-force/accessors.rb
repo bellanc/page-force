@@ -45,6 +45,7 @@ module PageObject
     alias_method :sfdc_phone, :sfdc_text_field
     alias_method :sfdc_int, :sfdc_text_field
     alias_method :sfdc_address, :sfdc_text_field
+    alias_method :sfdc_percent, :sfdc_text_field
 
     def sfdc_text_area(name, identifier, &block)
       sfdc_element_id = find_sfdc_field_id(identifier)

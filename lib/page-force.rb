@@ -9,7 +9,7 @@ require 'page-force/standard_object'
 
 module PageForce
   attr_accessor :custom_fields
-  attr_reader :sfdc_object_id, :sfdc_object_name, :sobject_descriptions
+  attr_reader :sfdc_object_id, :sfdc_object_name, :object_description
 
   SFDCObjectField = Struct.new(:field_name, :id)
 
@@ -46,7 +46,9 @@ module PageForce
 
         @object_fields.concat(StandardObject.const_get(sfdc_object_name)::STANDARD_FIELDS) if StandardObject.const_defined? sfdc_object_name
 
-        @object_description = Config.sobject_descriptions.find {|sobject| sobject.name.include? object_developer_name}
+        global_object_desciption = Config.sobject_descriptions.find { |sobject| sobject.name.match /#{object_developer_name}__c/ }
+        object_api_name = global_object_desciption ? global_object_desciption.name : sfdc_object_name
+        @object_description = Config.sfdc_api_client.describe(object_api_name)
         sfdc_object_name
       end
 
@@ -57,7 +59,7 @@ module PageForce
       private
       def self.generate_page_objects_for_sfdc_object
         @object_fields.each do |field|
-          field_desc = @object_description.fields.find {|field_desc| field_desc.name.match /#{field.field_name}/}
+          field_desc = @object_description.fields.find { |field_description| field_description.name.downcase == field.field_name.downcase  }
           send("sfdc_#{field_desc.type}", field.field_name.underscore, sfdc_field_id: field.id) if field_desc && field_desc.type != 'multipicklist'
         end
       end
