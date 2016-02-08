@@ -9,7 +9,7 @@ require 'page-force/standard_object'
 
 module PageForce
   attr_accessor :custom_fields
-  attr_reader :sfdc_object_id, :sfdc_object_name, :object_description
+  attr_reader :sfdc_object_id, :sfdc_object_name, :sobject_descriptions
 
   SFDCObjectField = Struct.new(:field_name, :id)
 
