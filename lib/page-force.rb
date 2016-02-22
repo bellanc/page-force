@@ -46,7 +46,7 @@ module PageForce
 
         @object_fields.concat(StandardObject.const_get(sfdc_object_name)::STANDARD_FIELDS) if StandardObject.const_defined? sfdc_object_name
 
-        global_object_desciption = Config.sobject_descriptions.find { |sobject| sobject.name.match /#{object_developer_name}__c/ }
+        global_object_desciption = Config.sobject_descriptions.find { |sobject| sobject.name.match /^#{object_developer_name}__c/ }
         object_api_name = global_object_desciption ? global_object_desciption.name : sfdc_object_name
         @object_description = Config.sfdc_api_client.describe(object_api_name)
         sfdc_object_name
@@ -59,11 +59,13 @@ module PageForce
       private
       def self.generate_page_objects_for_sfdc_object
         @object_fields.each do |field|
-          field_desc = @object_description.fields.find { |field_description| field_description.name.downcase == field.field_name.downcase  }
-          send("sfdc_#{field_desc.type}", field.field_name.underscore, sfdc_field_id: field.id) if field_desc && field_desc.type != 'multipicklist'
+          field_desc = @object_description.fields.find { |field_description| field_description.name.downcase.gsub('__c', '') == field.field_name.downcase }
+          if field_desc && field_desc.type != 'multipicklist'
+            send("sfdc_#{field_desc.type}", field.field_name.underscore, sfdc_field_id: field.id)
+            send("sfdc_#{field_desc.type}", field_desc.label.gsub(/\s+/, '').underscore, sfdc_field_id: field.id)
+          end
         end
       end
-
     end
   end
 end
