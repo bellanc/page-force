@@ -5,8 +5,8 @@ require 'watir-webdriver'
 module PageObject
   module Accessors
     def sfdc_cell(name, identifier, &block)
-      sfdc_element_id = find_sfdc_field_id(identifier)
-      cell(name, id: /#{sfdc_element_id}/, &block)
+      sfdc_label = identifier.fetch(:sfdc_label)
+      cell(name, xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
     end
 
     alias_method :sfdc_summary, :sfdc_cell
@@ -14,10 +14,10 @@ module PageObject
     alias_method :sfdc_datetime, :sfdc_cell
 
     def sfdc_text_field(name, identifier, &block)
-      sfdc_element_id = find_sfdc_field_id(identifier)
+      sfdc_label = identifier.fetch(:sfdc_label)
 
-      cell "#{name}_cell", id: /#{sfdc_element_id}/, &block
-      text_field "#{name}_text_field", id: sfdc_element_id, &block
+      cell "#{name}_cell", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block
+      text_field "#{name}_text_field", xpath: "//td[. = '#{sfdc_label}']/following::input[@type='text']", &block
 
 
       define_method("#{name}_element") do
@@ -48,10 +48,10 @@ module PageObject
     alias_method :sfdc_percent, :sfdc_text_field
 
     def sfdc_text_area(name, identifier, &block)
-      sfdc_element_id = find_sfdc_field_id(identifier)
+      sfdc_label = identifier.fetch(:sfdc_label)
 
-      cell "#{name}_cell", id: /#{sfdc_element_id}/, &block
-      text_area "#{name}_text_area", id: sfdc_element_id, &block
+      cell "#{name}_cell", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block
+      text_area "#{name}_text_area", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block
 
 
       define_method("#{name}_element") do
@@ -76,16 +76,16 @@ module PageObject
 
 
     def sfdc_button(name, identifier, &block)
-      sfdc_element_id = find_sfdc_field_id(identifier)
+      sfdc_label = identifier.fetch(:sfdc_label)
 
-      button(name, id: "#{sfdc_element_id}_ileinner", &block)
+      button(name, xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
     end
 
     def sfdc_checkbox(name, identifier, &block)
-      sfdc_element_id = find_sfdc_field_id(identifier)
+      sfdc_label = identifier.fetch(:sfdc_label)
 
-      img("#{name}_image", id: "#{sfdc_element_id}_chkbox", &block)
-      checkbox("#{name}_checkbox", id: sfdc_element_id, &block)
+      img("#{name}_image", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
+      checkbox("#{name}_checkbox", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
 
       define_method("#{name}_element") do
         send("#{name}_checkbox?") ? send("#{name}_checkbox_element") : send("#{name}_image_element")
@@ -111,10 +111,10 @@ module PageObject
     alias_method :sfdc_boolean, :sfdc_checkbox
 
     def sfdc_select_list(name, identifier, &block)
-      sfdc_element_id= find_sfdc_field_id(identifier)
+      sfdc_label = identifier.fetch(:sfdc_label)
 
-      cell("#{name}_cell", id: /#{sfdc_element_id}/, &block)
-      select_list("#{name}_select_list", id: sfdc_element_id, &block)
+      cell("#{name}_cell", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
+      select_list("#{name}_select_list", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
 
       define_method("#{name}_element") do
         send("#{name}_select_list?") ? send("#{name}_select_list_element") : send("#{name}_cell_element")
@@ -142,11 +142,11 @@ module PageObject
 
 
     def sfdc_link(name, identifier, &block)
-      sfdc_element_id= find_sfdc_field_id(identifier)
+      sfdc_label = identifier.fetch(:sfdc_label)
 
-      link("#{name}_link", id: /lookup(.*)#{sfdc_element_id}/, &block)
-      cell("#{name}_cell", id: /#{sfdc_element_id}/, &block)
-      text_field("#{name}_text_field", id: sfdc_element_id, &block)
+      link("#{name}_link", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
+      cell("#{name}_cell", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
+      text_field("#{name}_text_field", xpath: "//td[. = '#{sfdc_label}']/following::input[@type='text']", &block)
 
       define_method("#{name}_element") do
         if send("#{name}_text_field?")
@@ -181,12 +181,12 @@ module PageObject
     alias_method :sfdc_url, :sfdc_link
 
     def sfdc_lookup(name, identifier, &block)
-      sfdc_element_id= find_sfdc_field_id(identifier)
+      sfdc_label = identifier.fetch(:sfdc_label)
 
 
-      link("#{name}_link", id: /lookup(.*)#{sfdc_element_id}/, &block)
-      cell("#{name}_cell", id: /#{sfdc_element_id}/, &block)
-      text_field("#{name}_text_field", id: "CF#{sfdc_element_id}", &block)
+      link("#{name}_link", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
+      cell("#{name}_cell", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
+      text_field("#{name}_text_field", xpath: "//td[. = '#{sfdc_label}']/following::input[@type='text']", &block)
 
       define_method("#{name}_element") do
         if send("#{name}_text_field?")
@@ -226,31 +226,7 @@ module PageObject
       in_iframe({title: visualforce_page_name}, embedded_visualforce_page, &block)
     end
 
-    def sfdc_related_list(name, related_list_class, identifier)
-      sfdc_object_name = identifier.fetch(:sfdc_object_name) { raise InvalidIdentifierExecption, "#{identifier.keys.first} is not a valid identifier for this element type." }
-      related_object_id = sfdc_object_id_for_developer_name(sfdc_object_name)
-      related_list_id = "#{@sfdc_object_id}_#{related_object_id}"
-      page_section("#{name}_section", related_list_class, id: related_list_id)
-      define_method(name) do
-        send("#{name}_section")
-      end
-    end
 
-    private
-    def find_sfdc_field_id(identifier)
-      raise "sfdc_object_name not set for page class" unless @sfdc_object_name
-
-      if identifier.has_key? :sfdc_field_name
-        sfdc_field_name = identifier.fetch :sfdc_field_name
-        field_metadata = self.object_fields.find(-> { raise InvalidIdentifierExecption, "sfdc_field_name \"#{sfdc_field_name}\" not found." }) { |field| field.field_name == sfdc_field_name }
-        sfdc_field_id = field_metadata.id
-      elsif identifier.has_key? :sfdc_field_id
-        sfdc_field_id = identifier.fetch :sfdc_field_id
-      else
-        raise InvalidIdentifierExecption, "#{identifier.keys.first} is not a valid identifier for this element type."
-      end
-      sfdc_field_id
-    end
   end
 end
 

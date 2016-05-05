@@ -5,16 +5,6 @@ module PageForce
 
       def establish_connection(connection_args)
         @sfdc_api_client ||= Restforce.new connection_args
-        @sfdc_tooling_client ||= Restforce.tooling connection_args
-        @sobject_descriptions = @sfdc_api_client.describe
-      end
-
-      def sfdc_tooling_client=(sfdc_tooling_client)
-        if sfdc_tooling_client.instance_of?(Restforce::Tooling::Client)
-          @sfdc_tooling_client = sfdc_tooling_client
-        else
-          raise InvalidToolingClientException
-        end
       end
 
       def sfdc_api_client=(sfdc_api_client)
