@@ -199,7 +199,7 @@ module PageObject
       end
 
       define_method("#{name}?") do
-        send("#{name}_text_field?") || "#{name}_link?" || send("#{name}_cell?")
+        send("#{name}_text_field?") || send("#{name}_link?") || send("#{name}_cell?")
       end
 
       define_method(name) do
