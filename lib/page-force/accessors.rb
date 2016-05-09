@@ -114,7 +114,7 @@ module PageObject
       sfdc_label = identifier.fetch(:sfdc_label)
 
       cell("#{name}_cell", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
-      select_list("#{name}_select_list", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
+      select_list("#{name}_select_list", xpath: "//td[. = '#{sfdc_label}']/following::select", &block)
 
       define_method("#{name}_element") do
         send("#{name}_select_list?") ? send("#{name}_select_list_element") : send("#{name}_cell_element")
@@ -144,7 +144,7 @@ module PageObject
     def sfdc_link(name, identifier, &block)
       sfdc_label = identifier.fetch(:sfdc_label)
 
-      link("#{name}_link", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
+      link("#{name}_link", xpath: "//td[. = '#{sfdc_label}']/following-sibling::td/a", &block)
       cell("#{name}_cell", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
       text_field("#{name}_text_field", xpath: "//td[. = '#{sfdc_label}']/following::input[@type='text']", &block)
 
@@ -184,7 +184,7 @@ module PageObject
       sfdc_label = identifier.fetch(:sfdc_label)
 
 
-      link("#{name}_link", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
+      link("#{name}_link", xpath: "//td[. = '#{sfdc_label}']/following-sibling::td/a", &block)
       cell("#{name}_cell", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
       text_field("#{name}_text_field", xpath: "//td[. = '#{sfdc_label}']/following::input[@type='text']", &block)
 
