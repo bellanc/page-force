@@ -114,7 +114,7 @@ module PageObject
       sfdc_label = identifier.fetch(:sfdc_label)
 
       cell("#{name}_cell", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
-      select_list("#{name}_select_list", xpath: "//td[. = '#{sfdc_label}']/following::select", &block)
+      select_list("#{name}_select_list", xpath: "//td[. = '#{sfdc_label}']/following::td//select", &block)
 
       define_method("#{name}_element") do
         send("#{name}_select_list?") ? send("#{name}_select_list_element") : send("#{name}_cell_element")
@@ -144,15 +144,15 @@ module PageObject
     def sfdc_link(name, identifier, &block)
       sfdc_label = identifier.fetch(:sfdc_label)
 
-      link("#{name}_link", xpath: "//td[. = '#{sfdc_label}']/following-sibling::td/a", &block)
+      link("#{name}_link", xpath: "//td[. = '#{sfdc_label}']/following-sibling::td//a", &block)
       cell("#{name}_cell", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
       text_field("#{name}_text_field", xpath: "//td[. = '#{sfdc_label}']/following::input[@type='text']", &block)
 
       define_method("#{name}_element") do
-        if send("#{name}_text_field?")
-          send("#{name}_text_field_element")
-        elsif send("#{name}_link?")
+        if send("#{name}_link?")
           send("#{name}_link_element")
+        elsif send("#{name}_text_field?")
+          send("#{name}_text_field_element")
         else
           send("#{name}_cell_element")
         end
@@ -163,10 +163,10 @@ module PageObject
       end
 
       define_method(name) do
-        if send("#{name}_text_field?")
-          send("#{name}_text_field")
-        elsif send("#{name}_link?")
+        if send("#{name}_link?")
           send("#{name}_link")
+        elsif send("#{name}_text_field?")
+          send("#{name}_text_field")
         else
           send("#{name}_cell")
         end
@@ -184,29 +184,29 @@ module PageObject
       sfdc_label = identifier.fetch(:sfdc_label)
 
 
-      link("#{name}_link", xpath: "//td[. = '#{sfdc_label}']/following-sibling::td/a", &block)
+      link("#{name}_link", xpath: "//td[. = '#{sfdc_label}']/following-sibling::td//a", &block)
       cell("#{name}_cell", xpath: "//td[. = '#{sfdc_label}']/following::*[1]", &block)
       text_field("#{name}_text_field", xpath: "//td[. = '#{sfdc_label}']/following::input[@type='text']", &block)
 
       define_method("#{name}_element") do
-        if send("#{name}_text_field?")
-          send("#{name}_text_field_element")
-        elsif send("#{name}_link?")
+        if send("#{name}_link?")
           send("#{name}_link_element")
+        elsif send("#{name}_text_field?")
+          send("#{name}_text_field_element")
         else
           send("#{name}_cell_element")
         end
       end
 
       define_method("#{name}?") do
-        send("#{name}_text_field?") || send("#{name}_link?") || send("#{name}_cell?")
+        send("#{name}_link?") || send("#{name}_text_field?") || send("#{name}_cell?")
       end
 
       define_method(name) do
-        if send("#{name}_text_field?")
-          send("#{name}_text_field")
-        elsif send("#{name}_link?")
+        if send("#{name}_link?")
           send("#{name}_link")
+        elsif send("#{name}_text_field?")
+          send("#{name}_text_field")
         else
           send("#{name}_cell")
         end
